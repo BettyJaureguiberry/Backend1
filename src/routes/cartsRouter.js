@@ -9,10 +9,20 @@ cartsRouter.get("/", (req, res) => {
     const carts = CM.getCarts();
     res.send(carts);
 })
-cartsRouter.post("/", (req, res) => {
+/*cartsRouter.post("/", (req, res) => {
     CM.createCart();
     res.send({"estado":"OK", "mensaje":"El carrito se creó correctamente!"});
-})
+})*/
+
+cartsRouter.post("/", (req, res) => {
+    try {
+        const newCart = CM.createCart();
+        res.status(201).send({ "estado": "OK", "mensaje": `El carrito con ID ${newCart.id} se creó correctamente!`, "cart": newCart });
+    } catch (error) {
+        res.status(500).send({ "estado": "ERROR", "mensaje": "Hubo un error al crear el carrito.", "error": error.message });
+    }
+});
+
 cartsRouter.get("/:cid", (req, res) => {
     const cid = req.params.cid;
     const cart = CM.getCartById(cid);
