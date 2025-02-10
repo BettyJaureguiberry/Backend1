@@ -1,4 +1,5 @@
-import fs from "fs"
+import fs from "fs";
+import {v4 as uuidv4} from  'uuid'; 
 
 class CartManager {
     constructor() {
@@ -13,18 +14,7 @@ class CartManager {
         }
     }
 
-    getId() {
-        this.getCarts();
-        let max = 0;
-
-        this.carts.forEach(item => {
-            if (item.id > max) {
-                max = item.id;
-            }
-        })
-
-        return max + 1;
-    }
+    
 
     getCarts() {
         this.carts = JSON.parse(fs.readFileSync(this.file, "utf-8"));
@@ -40,9 +30,11 @@ class CartManager {
     }
 
     createCart() {
-        const cart = {id:this.getId(), products:[]};
+        
+        const cart = { id: uuidv4(), products: [] };
         this.carts.push(cart);
         this.saveCarts();
+        return cart;
     }
 
     addCartProduct(cid, pid) {
