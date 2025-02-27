@@ -1,21 +1,20 @@
 const socket = io();
 
 socket.on("realtimeproducts", data => {
+    console.log(data); // para ver el contenido de data
     limpiarSelectEliminarProducto();
     let contenidoHTML = "";
 
-    data.forEach(item => {
-        contenidoHTML += `
-            <div class="col-md-3">
-                <div class="card text-center border-0 fw-light">
-                    <img src="${item.thumbnails[0]}" class="img-fluid" alt="${item.title}">
-                    <div class="card-body">
-                        <h5 class="card-text">${item.title}</h5>
-                        <p class="card-text">${item.description}</p>
-                        <p class="card-footer fw-semibold" style="background-color: #f8eff4;" >$${item.price}</p>
-                    </div>
+    data.payload.forEach(item => {
+        contenidoHTML += `<div class="col-md-3">
+            <div class="card text-center border-0 fw-light">
+                <img src="${item.thumbnails[0]}" class="img-fluid" alt="${item.title}">
+                <div class="card-body">
+                    <p class="card-text">${item.title}</p>
+                    <p class="card-text">$${item.price}</p>
                 </div>
-            </div>`;
+            </div>
+        </div>`;
 
         agregarItemEliminarProducto(item);
     });

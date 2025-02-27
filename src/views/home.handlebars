@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row">
-        {{#each products}}
+        {{#each products.payload}}
             <div class="col-md-3">
                 <div class="card text-center border-0 fw-light">
                     <img src="{{this.thumbnails}}" class="img-fluid" alt="{{this.title}}">
@@ -8,10 +8,26 @@
                         <h5 class="card-text">{{this.title}}</h5>
                         <p class="card-text">{{this.description}}</p>
                         <p class="card-footer fw-semibold" style="background-color: #f8eff4;" >${{this.price}}</p>
+                        
                     </div>
                 </div>
             </div>
         {{/each}}
         </ul>
+    </div>
+    <div class="row">
+        <div class="col text-center">
+            {{#if products.hasPrevPage}}
+                <a href="{{products.prevLink}}" class="text-decoration-none mx-3">⬅️</a>
+            {{/if}}
+        
+            {{#if products.page}}
+                <a href="#" class="text-decoration-none mx-3">{{products.page}}</a>
+            {{/if}}
+        
+            {{#if products.hasNextPage}}
+                <a href="{{products.nextLink}}" class="text-decoration-none mx-3">➡️</a>
+            {{/if}}
+        </div>
     </div>
 </div>

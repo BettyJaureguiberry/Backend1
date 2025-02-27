@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    
+</head>
+<body>
+    <h5>Detalle Carrito</h5>
+    <div class="container">
+    <div class="row">
+    {{#each cart.products}}
+        <div class="col-md-3">
+            <div class="card text-center border-1 fw-light">
+                <div class="card-body">
+                    <h5 class="card-title text-center fw-semibold " style="background-color: #f8eff4;">{{this.product.title}}</h5>
+                    <p class="card-text text-center"><strong>Código: </strong>{{this.product.code}}</p>
+                    <p class="card-text text-center"><strong>Precio: </strong>${{this.product.price}}</p>
+                    <p class="card-text text-center"><strong>Categoría: </strong>{{this.product.category}}</p>
+                    <p class="card-footer fw-semibold text-center" style="background-color: #f8eff4;"><strong>Cantidad: </strong> {{this.quantity}}</p>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+    </div>
+    </div>
+    
+</body>
+</html>

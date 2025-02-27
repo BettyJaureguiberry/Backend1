@@ -1,80 +1,65 @@
-import fs from "fs"
+
+import { productsModel } from "../models/products.model.js";
 
 class ProductManager {
-    constructor() {
-        this.products = [],
-        this.file = "productos.json",
-        this.createFile()
-    }
+    async getProducts(limit, page, query, sort) {
+        try {
+            limit = limit ? limit : 10;
+            page = page >= 1 ? page : 1;
+            query = query ? query : "";
+            sort = sort === "desc" ? { title: -1 } : { title: 1 }; // Ordenar por titulo de forma ascendente o descendente
+            let result;
 
-    createFile() {
-        if (!fs.existsSync(this.file)) {
-            fs.writeFileSync(this.file, JSON.stringify(this.products))
-        }
-    }
-
-    getId() {
-        this.getProducts();
-        let max = 0;
-
-        this.products.forEach(item => {
-            if (item.id > max) {
-                max = item.id;
+            if (query) {            
+                result = await productsModel.paginate({ category: query }, { limit: limit, page: page, sort: sort, lean: true });
+            } else {                
+                result = await productsModel.paginate({}, { limit: limit, page: page, sort: sort, lean: true });
             }
-        })
 
-        return max + 1;
-    }
-
-    getTitleById(id) {
-        const product = this.getProductById(id);
-        return product.title;
-    }
-    getProducts() {
-        this.products = JSON.parse(fs.readFileSync(this.file, "utf-8"));
-        
-        return this.products;
-    }
-
-    getProductById(id) {        
-        this.getProducts();
-        let product = this.products.find(item => item.id == id);
-        
-        return product ? product : {"Error":"No se encontró el Producto!"};
-    }
-
-    addProduct(product) {
-        this.getProducts();
-        let newProduct = {id:this.getId(), ...product};
-        this.products.push(newProduct);
-        this.saveProducts();
-        
-    }
-
-    editProduct(id, product) {
-        this.getProducts();
-        let actualProduct = this.products.find(item => item.id == id);
-
-        if (!actualProduct) {
-            console.error("Producto no encontrado");
-            return;
+            result = {status:"success", payload:result.docs, totalPages:result.totalPages, prevPage:result.prevPage, nextPage:result.nextPage, page:result.page, hasPrevPage:result.hasPrevPage, hasNextPage:result.hasNextPage, prevLink:(result.hasPrevPage ? "/?limit=" + limit + "&page=" + (result.page-1) : null), nextLink:(result.hasNextPage ? "/?limit=" + limit + "&page=" + (result.page+1) : null)};
+    
+            return result;
+        } catch (error) {
+            return {status:"error", payload:""}
         }
-        
-        Object.assign(actualProduct, product);
-        this.saveProducts();
     }
 
-    deleteProduct(id) {
-        this.getProducts();
-        this.products = this.products.filter(item => item.id != id);
-        this.saveProducts();
+    async getProductById(id) {
+        try {
+            let product = await productsModel.findOne({ _id: id }).lean();
+            return product ? product : { "error": "No se encontró el Producto!" };
+        } catch (error) {
+            return { "error": "Error al obtener el producto!" };
+        }
     }
 
-    saveProducts() {
-        fs.writeFileSync(this.file, JSON.stringify(this.products));
+    async addProduct(product) {
+        await productsModel.create({...product});
+    }
+
+    async editProduct(id, product) {
+        await productsModel.updateOne({_id:id}, {...product});
+    }
+
+    async deleteProduct(id) {
+        await productsModel.deleteOne({_id:id});
+    }
+
+    async getTitleById(id) {
+        try {
+            let product = await productsModel.findOne({ _id: id }).lean();
+            return product ? product.title : { "error": "No se encontró el Producto!" };
+        } catch (error) {
+            return { "error": "Error al obtener el título del producto!" };
+        }
     }
 }
 
-export default ProductManager;
 const PM = new ProductManager();
-export const getTitleById = (id) => PM.getTitleById(id);
+export const getTitleById = async (id) => await PM.getTitleById(id);
+export const getProductById = async (id) => await PM.getProductById(id);
+
+export default ProductManager;
+
+
+

@@ -4,13 +4,22 @@ import ProductManager from "../classes/ProductManager.js";
 const viewsRouter = Router();
 const PM = new ProductManager();
 
-viewsRouter.get("/", (req, res) => {
-    let products = PM.getProducts();    
+viewsRouter.get("/", async (req, res) => {
+
+    const {limit, page, query, sort} = req.query; 
+    let products = await PM.getProducts(limit, page, query, sort);  
 
     res.render("home", {products:products});
 })
 
-viewsRouter.get("/realtimeproducts", (req, res) => {
+viewsRouter.get("/products/:pid", async (req, res) => {
+    const {pid} = req.params;    
+    let product = await PM.getProductById(pid);
+
+    res.render("product", {product:product});
+})
+
+viewsRouter.get("/realtimeproducts",  (req, res) => {
     res.render("realtimeproducts");
 })
 
